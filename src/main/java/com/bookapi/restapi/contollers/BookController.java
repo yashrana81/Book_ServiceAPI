@@ -3,6 +3,7 @@ package com.bookapi.restapi.contollers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,34 +22,69 @@ public class BookController {
     BookService bookService;
     
     @GetMapping("/books/{id}")
-    public Book getBook(@PathVariable("id") int id)
+    public ResponseEntity<Book> getBook(@PathVariable("id") int id)
     {
-        return bookService.getBookById(id);
+        Book book = bookService.getBookById(id);
+        if(book == null)
+        {
+            return ResponseEntity.notFound().build();
+        }
+        else
+        {
+            return ResponseEntity.ok(book);
+        }
     }
 
     @GetMapping("/books")
-    public List<Book> getBooks()
+    public ResponseEntity<List<Book>> getBooks()
     {
-        return bookService.getAllBooks();
+        List<Book> booksList = bookService.getAllBooks();
+        if(booksList.size()<=0)
+        {
+            return ResponseEntity.notFound().build();
+        }
+        else{
+            return ResponseEntity.ok(booksList);
+        }
     }
 
     @PostMapping("/books")
-    public Book postBook(@RequestBody Book book)
+    public ResponseEntity<Book> postBook(@RequestBody Book book)
     {
-        Book b = bookService.addBook(book);
-        return b;
+        Book b = null;
+        try{
+            b = bookService.addBook(book);
+            return ResponseEntity.ok(b);
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @DeleteMapping("books/{bookId}")
-    public void deleteBookbyId(@PathVariable("bookId") int bid)
+    public ResponseEntity<Void> deleteBookbyId(@PathVariable("bookId") int bid)
     {
-        this.bookService.deleteBook(bid);
+        try{
+            bookService.deleteBook(bid);
+            return ResponseEntity.noContent().build();
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PutMapping("books/{bookId}")
-    public Book updateBookbyId(@PathVariable("bookId") int bid,@RequestBody Book book)
+    public ResponseEntity<Book> updateBookbyId(@PathVariable("bookId") int bid,@RequestBody Book book)
     {
-        bookService.updateBook(bid,book);
-        return book;
+       try{
+            bookService.updateBook(bid, book);
+            return ResponseEntity.ok(book);
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
