@@ -19,7 +19,7 @@ import com.bookapi.restapi.service.BookService;
 public class BookController {
 
     @Autowired
-    BookService bookService;
+    private BookService bookService;
     
     @GetMapping("/books/{id}")
     public ResponseEntity<Book> getBook(@PathVariable("id") int id)
@@ -27,7 +27,7 @@ public class BookController {
         Book book = bookService.getBookById(id);
         if(book == null)
         {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
         else
         {
